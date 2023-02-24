@@ -26,18 +26,22 @@ pub fn parse_ranks(html: &VDom) -> Result<Vec<Rank>> {
                     .as_bytes(),
             )
             .expect("invalid utf8");
+
+            let role_attr = query_selector(html, role_wrapper, ".Profile-playerSummary--role")?
+                .children()
+                .all(html.parser())
+                .get(0)
+                .ok_or(Error::parse("Invalid structure"))?
+                .as_tag()
+                .ok_or(Error::parse("Invalid structure"))?
+                .attributes();
+
             let role_url = std::str::from_utf8(
-                query_selector(html, role_wrapper, ".Profile-playerSummary--role")?
-                    .children()
-                    .all(html.parser())
-                    .get(0)
-                    .ok_or(Error::parse("Invalid structure"))?
-                    .as_tag()
-                    .ok_or(Error::parse("Invalid structure"))?
-                    .attributes()
+                role_attr
                     .get("src")
+                    .or(role_attr.get("xlink:href"))
                     .flatten()
-                    .ok_or(Error::parse("Rank url not found"))?
+                    .ok_or(Error::parse("Role url not found"))?
                     .as_bytes(),
             )
             .expect("invalid utf8");

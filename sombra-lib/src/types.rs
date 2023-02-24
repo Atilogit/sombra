@@ -128,6 +128,19 @@ impl Battletag {
     }
 }
 
+impl FromStr for Battletag {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (name, number) = s.split_once('#').ok_or(())?;
+        let number = number.parse().map_err(|_| ())?;
+        Ok(Battletag {
+            name: name.to_owned(),
+            number,
+        })
+    }
+}
+
 mod btag_from_string {
     use crate::Battletag;
 
