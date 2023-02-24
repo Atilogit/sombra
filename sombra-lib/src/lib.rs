@@ -44,7 +44,6 @@ impl Client {
     pub async fn profile(&self, btag: &Battletag) -> Result<PlayerProfile> {
         let url = "https://overwatch.blizzard.com/en-us/career/";
         let html = self.get(format!("{url}{btag:#}/")).await?;
-        let start = Instant::now();
         let html = tl::parse(&html, ParserOptions::new())?;
 
         let title = profile::find_by_class(&html, "Profile-player--title");
@@ -64,8 +63,6 @@ impl Client {
             .map(|s| s.to_owned());
 
         let ranks = profile::parse_ranks(&html)?;
-
-        println!("Parsing took {:?}", start.elapsed());
 
         Ok(PlayerProfile {
             title,
