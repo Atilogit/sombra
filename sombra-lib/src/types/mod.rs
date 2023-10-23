@@ -76,7 +76,8 @@ impl<const MAX: u64> Display for Limited<MAX> {
 }
 
 impl<const MAX: u64> Limited<MAX> {
-    pub fn inner(self) -> u64 {
+    #[must_use]
+    pub const fn inner(self) -> u64 {
         self.0
     }
 }
@@ -84,8 +85,19 @@ impl<const MAX: u64> Limited<MAX> {
 impl<const MAX: u64> FromStr for Limited<MAX> {
     type Err = ();
 
+    #[allow(clippy::map_err_ignore)]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let val: u64 = s.parse().map_err(|_| ())?;
+        val.try_into().map_err(|_| ())
+    }
+}
+
+impl<const MAX: u64> TryFrom<char> for Limited<MAX> {
+    type Error = ();
+
+    #[allow(clippy::map_err_ignore)]
+    fn try_from(c: char) -> Result<Self, Self::Error> {
+        let val: u64 = c.to_digit(10).ok_or(())? as u64;
         val.try_into().map_err(|_| ())
     }
 }
@@ -95,7 +107,7 @@ impl<const MAX: u64> TryFrom<u64> for Limited<MAX> {
 
     fn try_from(value: u64) -> Result<Self, Self::Error> {
         if value <= MAX {
-            Ok(Limited(value))
+            Ok(Self(value))
         } else {
             Err(value)
         }
@@ -131,10 +143,11 @@ impl Battletag {
 impl FromStr for Battletag {
     type Err = ();
 
+    #[allow(clippy::map_err_ignore)]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (name, number) = s.split_once('#').ok_or(())?;
         let number = number.parse().map_err(|_| ())?;
-        Ok(Battletag {
+        Ok(Self {
             name: name.to_owned(),
             number,
         })
@@ -151,7 +164,7 @@ mod btag_from_string {
         ser.serialize_str(&format!("{btag}"))
     }
 
-    pub fn deserialize<'a, D: serde::Deserializer<'a>>(
+    pub fn deserialize<'de, D: serde::Deserializer<'de>>(
         de: D,
     ) -> std::result::Result<super::Battletag, D::Error> {
         struct Visitor;
@@ -167,7 +180,7 @@ mod btag_from_string {
             where
                 E: serde::de::Error,
             {
-                let (name, number) = v.split_once('#').ok_or(E::custom("no # found"))?;
+                let (name, number) = v.split_once('#').ok_or_else(|| E::custom("no # found"))?;
                 let number = number.parse().map_err(|e| E::custom(e))?;
                 Ok(Battletag {
                     name: name.to_owned(),

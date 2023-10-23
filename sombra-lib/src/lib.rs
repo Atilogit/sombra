@@ -1,10 +1,10 @@
 #![forbid(clippy::unwrap_used)]
+#![allow(clippy::missing_panics_doc)]
+#![allow(clippy::missing_errors_doc)]
 
 mod error;
 mod profile;
 mod types;
-
-use std::time::Instant;
 
 pub use error::*;
 use tl::ParserOptions;
@@ -21,11 +21,12 @@ impl Default for Client {
 }
 
 impl Client {
+    #[must_use]
     pub fn new() -> Self {
         Self { client: reqwest::Client::builder()
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
         .build()
-        .expect("Could not build reqwest client") }
+        .expect("Could not build client") }
     }
 
     async fn get(&self, url: String) -> Result<String> {
@@ -50,17 +51,20 @@ impl Client {
 
         let endorsement_url =
             profile::tag_content_by_class(&html, "Profile-playerSummary--endorsement", "src")?
-                .ok_or(Error::parse("Unable to find endorsement level"))?;
+                .ok_or_else(|| Error::parse("Unable to find endorsement level"))?;
 
         let endorsement = profile::url_file_name(endorsement_url)
-            .ok_or(Error::parse("Invalid endorsement url"))?[..1]
-            .parse()
-            .map_err(|_| Error::parse("Invalid endorsement url"))?;
+            .ok_or_else(|| Error::parse("Invalid endorsement url"))?
+            .chars()
+            .next()
+            .ok_or_else(|| Error::parse("Invalid endorsement url"))?
+            .try_into()
+            .map_err(|()| Error::parse("Invalid endorsement url"))?;
 
         let portrait = profile::tag_content_by_class(&html, "Profile-player--portrait", "src")
             .ok()
             .flatten()
-            .map(|s| s.to_owned());
+            .map(std::borrow::ToOwned::to_owned);
 
         let ranks = profile::parse_ranks(&html)?;
 
