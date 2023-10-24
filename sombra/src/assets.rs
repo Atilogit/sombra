@@ -1,6 +1,7 @@
 use std::{collections::HashMap, fmt::Debug, hash::Hash};
 
 use serde_derive::{Deserialize, Serialize};
+use url::Url;
 
 use crate::{Client, Error};
 
@@ -24,7 +25,7 @@ pub struct Asset {
     pub is_new: bool,
     pub is_marked: bool,
     pub data: Data,
-    pub icon: Option<String>,
+    pub icon: Option<Url>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

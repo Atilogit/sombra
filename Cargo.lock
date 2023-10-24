@@ -935,6 +935,7 @@ dependencies = [
  "thiserror",
  "tl",
  "tokio",
+ "url",
 ]
 
 [[package]]
@@ -1138,6 +1139,7 @@ dependencies = [
  "form_urlencoded",
  "idna",
  "percent-encoding",
+ "serde",
 ]
 
 [[package]]
