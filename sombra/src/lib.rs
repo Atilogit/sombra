@@ -1,11 +1,19 @@
 #![allow(clippy::missing_panics_doc)]
 #![allow(clippy::missing_errors_doc)]
 
+mod assets;
+mod btag;
 mod error;
-mod types;
+mod overbuff;
+mod profile;
+mod search;
 
+pub use assets::*;
+pub use btag::*;
 pub use error::*;
-pub use types::*;
+pub use overbuff::*;
+pub use profile::*;
+pub use search::*;
 
 pub struct Client {
     client: reqwest::Client,
@@ -26,20 +34,9 @@ impl Client {
         .expect("Could not build client") }
     }
 
-    async fn get(&self, url: String) -> Result<String> {
+    async fn get(&self, url: &str) -> crate::Result<String> {
         let response = self.client.get(url).send().await?;
         Error::result_from_status(response.status(), None)?;
         Ok(response.text().await?)
-    }
-
-    pub async fn search(&self, name: &str) -> Result<Vec<FoundPlayer>> {
-        let url = "https://overwatch.blizzard.com/en-us/search/account-by-name/";
-        Ok(serde_json::from_str(
-            &self.get(format!("{url}{name}")).await?,
-        )?)
-    }
-
-    pub async fn profile(&self, btag: &Battletag) -> Result<PlayerProfile> {
-        todo!()
     }
 }

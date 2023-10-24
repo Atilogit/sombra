@@ -9,6 +9,17 @@ async fn main() {
 
     dbg!(&found);
 
+    let assets = client.assets().await.unwrap();
+
+    std::fs::write("assets.txt", format!("{assets:#?}")).unwrap();
+
+    for f in &found {
+        dbg!(f.frame.map(|id| assets.get(&id)));
+        dbg!(f.namecard.map(|id| assets.get(&id)));
+        dbg!(f.portrait.map(|id| assets.get(&id)));
+        dbg!(f.title.map(|id| assets.get(&id)));
+    }
+
     let profiles = join_all([
         client.profile(&found[0].battle_tag),
         client.profile(&Battletag::new("Zusor", 2553)),

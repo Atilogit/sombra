@@ -13,8 +13,8 @@ pub enum Error {
     Http(StatusCode),
     #[error("HTML parsing error: {0}")]
     Html(#[from] tl::ParseError),
-    #[error("Profile parsing error: {0}")]
-    Parse(String),
+    #[error("Profile parsing error")]
+    Parse,
 }
 
 impl Error {
@@ -29,10 +29,5 @@ impl Error {
         } else {
             Err(Self::Http(code))
         }
-    }
-
-    #[must_use]
-    pub fn parse(msg: &str) -> Self {
-        Self::Parse(msg.to_owned())
     }
 }
