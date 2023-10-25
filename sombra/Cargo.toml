@@ -18,6 +18,8 @@ futures.workspace = true
 chrono.workspace = true
 url.workspace = true
 tracing = "0.1"
+cached = { version = "0.46", features = ["async"] }
+parking_lot = "0.12"
 
 [dev-dependencies]
 tracing-subscriber = "0.3"

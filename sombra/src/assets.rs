@@ -105,7 +105,7 @@ pub enum ContentType {
 
 impl Client {
     #[instrument(level = "debug", skip(self))]
-    pub async fn assets(&self) -> crate::Result<HashMap<Id, Asset>> {
+    pub async fn fetch_assets(&mut self) -> crate::Result<()> {
         let html = self
             .get("https://overwatch.blizzard.com/en-us/search/")
             .await?;
@@ -119,8 +119,9 @@ impl Client {
         assets.extend(avatars.into_iter());
         assets.extend(namecards.into_iter());
         assets.extend(titles.into_iter());
+        self.assets = assets;
 
-        Ok(assets)
+        Ok(())
     }
 }
 

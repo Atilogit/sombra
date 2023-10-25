@@ -13,7 +13,7 @@ use util::{find_attr, find_inner_text, url_file};
 
 impl Client {
     #[instrument(level = "debug", skip(self))]
-    pub async fn profile(&self, btag: Battletag) -> crate::Result<PlayerProfile> {
+    pub async fn profile(&self, btag: &Battletag) -> crate::Result<PlayerProfile> {
         let url = "https://overwatch.blizzard.com/en-us/career/";
         let html = self.get(&format!("{url}{btag:#}/")).await?;
         let dom = tl::parse(&html, ParserOptions::new())?;
@@ -33,7 +33,7 @@ impl Client {
         }
 
         Ok(PlayerProfile {
-            battletag: btag,
+            battletag: btag.clone(),
             title: find_inner_text(&dom, ".Profile-player--title"),
             endorsement: endorsement(&dom)?,
             portrait: portrait(&dom)?,
