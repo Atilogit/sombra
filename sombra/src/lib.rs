@@ -1,5 +1,6 @@
 #![allow(clippy::missing_panics_doc)]
 #![allow(clippy::missing_errors_doc)]
+#![allow(clippy::map_err_ignore)]
 
 mod assets;
 mod btag;
