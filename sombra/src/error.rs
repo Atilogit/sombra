@@ -32,7 +32,8 @@ impl Error {
     }
 
     #[must_use]
-    pub const fn parse() -> Self {
+    pub fn parse() -> Self {
+        eprintln!("{}", std::backtrace::Backtrace::capture());
         Self::Parse
     }
 }

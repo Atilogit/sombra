@@ -1,3 +1,5 @@
+use chrono::serde::ts_seconds;
+use chrono::{DateTime, Utc};
 use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::Display;
@@ -16,6 +18,8 @@ pub struct PlayerProfile {
     pub portrait: Url,
     pub ranks: Vec<Rank>,
     pub private: bool,
+    #[serde(with = "ts_seconds")]
+    pub last_updated: DateTime<Utc>,
     pub quickplay_console: HashMap<String, HeroStats>,
     pub competitive_console: HashMap<String, HeroStats>,
     pub quickplay_pc: HashMap<String, HeroStats>,

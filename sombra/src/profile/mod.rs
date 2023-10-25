@@ -3,6 +3,7 @@ mod util;
 
 use self::util::{find, find2, find_all, find_all2, find_attr2, find_inner_text2};
 use crate::{Battletag, Client, Error};
+use chrono::{DateTime, TimeZone, Utc};
 use std::collections::HashMap;
 use tl::{ParserOptions, VDom};
 use tracing::instrument;
@@ -38,6 +39,7 @@ impl Client {
             portrait: portrait(&dom)?,
             ranks: ranks(&dom)?,
             private: !public,
+            last_updated: last_update(&dom)?,
             quickplay_console,
             competitive_console,
             quickplay_pc,
@@ -163,4 +165,11 @@ fn portrait<'dom>(dom: &'dom VDom<'dom>) -> crate::Result<Url> {
         .ok_or_else(Error::parse)?
         .parse()
         .map_err(|_| Error::parse())
+}
+
+#[instrument(skip_all)]
+fn last_update<'dom>(dom: &'dom VDom<'dom>) -> crate::Result<DateTime<Utc>> {
+    let ts_str = find_attr(dom, ".Profile-masthead", "data-lastUpdate").ok_or_else(Error::parse)?;
+    let ts: i64 = ts_str.parse().map_err(|_| Error::parse())?;
+    Utc.timestamp_opt(ts, 0).single().ok_or_else(Error::parse)
 }
