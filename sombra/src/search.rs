@@ -1,5 +1,6 @@
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde_derive::{Deserialize, Serialize};
+use tracing::instrument;
 
 use crate::{Battletag, Client, Id};
 
@@ -17,6 +18,7 @@ pub struct FoundPlayer {
 }
 
 impl Client {
+    #[instrument(skip(self))]
     pub async fn search(&self, name: &str) -> crate::Result<Vec<FoundPlayer>> {
         let url = "https://overwatch.blizzard.com/en-us/search/account-by-name/";
         Ok(serde_json::from_str(

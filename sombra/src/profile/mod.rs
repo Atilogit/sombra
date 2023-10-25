@@ -5,11 +5,13 @@ use self::util::{find, find2, find_all, find_all2, find_attr2, find_inner_text2}
 use crate::{Battletag, Client, Error};
 use std::collections::HashMap;
 use tl::{ParserOptions, VDom};
+use tracing::instrument;
 pub use types::*;
 use url::Url;
 use util::{find_attr, find_inner_text, url_file};
 
 impl Client {
+    #[instrument(skip(self))]
     pub async fn profile(&self, btag: Battletag) -> crate::Result<PlayerProfile> {
         let url = "https://overwatch.blizzard.com/en-us/career/";
         let html = self.get(&format!("{url}{btag:#}/")).await?;
@@ -44,6 +46,7 @@ impl Client {
     }
 }
 
+#[instrument(skip_all)]
 fn hero_stats<'dom>(
     dom: &'dom VDom<'dom>,
     qp: bool,
@@ -93,6 +96,7 @@ fn hero_stats<'dom>(
     Ok(heroes)
 }
 
+#[instrument(skip_all)]
 fn ranks<'dom>(dom: &'dom VDom<'dom>) -> crate::Result<Vec<Rank>> {
     let mut ranks = Vec::new();
     for rank_wrapper in find_all(dom, ".Profile-playerSummary--rankWrapper") {
@@ -142,6 +146,7 @@ fn ranks<'dom>(dom: &'dom VDom<'dom>) -> crate::Result<Vec<Rank>> {
     Ok(ranks)
 }
 
+#[instrument(skip_all)]
 fn endorsement<'dom>(dom: &'dom VDom<'dom>) -> crate::Result<Endorsement> {
     let endorsement_url =
         find_attr(dom, ".Profile-playerSummary--endorsement", "src").ok_or_else(Error::parse)?;
@@ -152,6 +157,7 @@ fn endorsement<'dom>(dom: &'dom VDom<'dom>) -> crate::Result<Endorsement> {
         .map_err(|_| Error::parse())
 }
 
+#[instrument(skip_all)]
 fn portrait<'dom>(dom: &'dom VDom<'dom>) -> crate::Result<Url> {
     find_attr(dom, ".Profile-player--portrait", "src")
         .ok_or_else(Error::parse)?

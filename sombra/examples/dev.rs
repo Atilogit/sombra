@@ -1,13 +1,16 @@
 use futures::future::join_all;
 use sombra::{Battletag, Client};
+use tracing_subscriber::fmt::format::FmtSpan;
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt()
+        .with_span_events(FmtSpan::CLOSE)
+        .init();
+
     let client = Client::new();
 
     let found = client.search("gazanie").await.unwrap();
-
-    dbg!(&found);
 
     let assets = client.assets().await.unwrap();
 

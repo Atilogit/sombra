@@ -15,6 +15,7 @@ pub use error::*;
 pub use overbuff::*;
 pub use profile::*;
 pub use search::*;
+use tracing::instrument;
 
 pub struct Client {
     client: reqwest::Client,
@@ -35,6 +36,7 @@ impl Client {
         .expect("Could not build client") }
     }
 
+    #[instrument(skip(self))]
     async fn get(&self, url: &str) -> crate::Result<String> {
         let response = self.client.get(url).send().await?;
         Error::result_from_status(response.status(), None)?;
