@@ -16,8 +16,10 @@ pub struct PlayerProfile {
     pub portrait: Url,
     pub ranks: Vec<Rank>,
     pub private: bool,
-    pub quickplay_stats: HashMap<String, HeroStats>,
-    pub competitive_stats: HashMap<String, HeroStats>,
+    pub quickplay_console: HashMap<String, HeroStats>,
+    pub competitive_console: HashMap<String, HeroStats>,
+    pub quickplay_pc: HashMap<String, HeroStats>,
+    pub competitive_pc: HashMap<String, HeroStats>,
 }
 
 bounded_integer::bounded_integer! {

@@ -109,9 +109,9 @@ impl Client {
             .await?;
         let mut split = html.split("const ").skip(2);
 
-        let avatars: HashMap<Id, Asset> = parse_json_var(split.next().ok_or(Error::Parse)?)?;
-        let namecards: HashMap<Id, Asset> = parse_json_var(split.next().ok_or(Error::Parse)?)?;
-        let titles: HashMap<Id, Asset> = parse_json_var(split.next().ok_or(Error::Parse)?)?;
+        let avatars: HashMap<Id, Asset> = parse_json_var(split.next().ok_or_else(Error::parse)?)?;
+        let namecards: HashMap<Id, Asset> = parse_json_var(split.next().ok_or_else(Error::parse)?)?;
+        let titles: HashMap<Id, Asset> = parse_json_var(split.next().ok_or_else(Error::parse)?)?;
 
         let mut assets = HashMap::new();
         assets.extend(avatars.into_iter());
@@ -126,11 +126,11 @@ fn parse_json_var<'de, T: serde::Deserialize<'de>>(js: &'de str) -> crate::Resul
     let json = js
         .split('=')
         .nth(1)
-        .ok_or(Error::Parse)?
+        .ok_or_else(Error::parse)?
         .trim()
         .split("</script>")
         .next()
-        .ok_or(Error::Parse)?;
+        .ok_or_else(Error::parse)?;
     Ok(serde_json::from_str::<'de>(json)?)
 }
 

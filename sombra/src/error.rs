@@ -30,4 +30,10 @@ impl Error {
             Err(Self::Http(code))
         }
     }
+
+    #[must_use]
+    pub fn parse() -> Self {
+        panic!("parse error");
+        Self::Parse
+    }
 }

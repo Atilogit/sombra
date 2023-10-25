@@ -3,7 +3,7 @@ use tl::{HTMLTag, VDom};
 use crate::Error;
 
 pub fn url_file(url: &str) -> crate::Result<&str> {
-    url.split('/').last().ok_or(Error::Parse)
+    url.split('/').last().ok_or_else(Error::parse)
 }
 
 pub fn find_all<'dom>(
