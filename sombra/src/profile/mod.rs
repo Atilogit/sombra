@@ -1,7 +1,9 @@
 mod types;
-mod util;
 
-use self::util::{find, find2, find_all, find_all2, find_attr2, find_inner_text2};
+use crate::util::{
+    find, find2, find_all, find_all2, find_attr, find_attr2, find_inner_text, find_inner_text2,
+    url_file,
+};
 use crate::{Battletag, Client, Error};
 use chrono::{DateTime, TimeZone, Utc};
 use std::collections::HashMap;
@@ -9,7 +11,6 @@ use tl::{ParserOptions, VDom};
 use tracing::instrument;
 pub use types::*;
 use url::Url;
-use util::{find_attr, find_inner_text, url_file};
 
 impl Client {
     #[instrument(level = "debug", skip(self))]

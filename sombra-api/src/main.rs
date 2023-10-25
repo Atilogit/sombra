@@ -9,7 +9,7 @@ use axum::{
     routing::get,
     Json, Router,
 };
-use sombra::{Battletag, CachedClient, FoundPlayer, PlayerProfile, PlayerProfileReduced};
+use sombra::{Battletag, CachedClient, FoundPlayer, Overbuff, PlayerProfile, PlayerProfileReduced};
 
 async fn search(
     State(client): State<Arc<CachedClient>>,
@@ -35,7 +35,7 @@ async fn profile(
 async fn overbuff(
     State(client): State<Arc<CachedClient>>,
     Path(btag): Path<Battletag>,
-) -> Result<Json<()>> {
+) -> Result<Json<Overbuff>> {
     Ok(Json(client.overbuff(&btag).await?))
 }
 

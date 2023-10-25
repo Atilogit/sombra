@@ -9,6 +9,7 @@ mod error;
 mod overbuff;
 mod profile;
 mod search;
+mod util;
 
 use std::collections::HashMap;
 

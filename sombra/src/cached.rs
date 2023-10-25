@@ -4,7 +4,7 @@ use parking_lot::Mutex;
 use serde_derive::{Deserialize, Serialize};
 use url::Url;
 
-use crate::{Battletag, Client, Endorsement, FoundPlayer, PlayerProfile, Rank};
+use crate::{Battletag, Client, Endorsement, FoundPlayer, Overbuff, PlayerProfile, Rank};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -23,7 +23,7 @@ pub struct PlayerProfileReduced {
 pub struct CachedClient {
     client: Client,
     profile_cache: Mutex<TimedCache<Battletag, PlayerProfile>>,
-    overbuff_cache: Mutex<TimedCache<Battletag, ()>>,
+    overbuff_cache: Mutex<TimedCache<Battletag, Overbuff>>,
     search_cache: Mutex<TimedCache<String, Vec<FoundPlayer>>>,
 }
 
@@ -31,9 +31,9 @@ impl CachedClient {
     pub async fn new() -> crate::Result<Self> {
         Ok(Self {
             client: Client::new().await?,
-            profile_cache: Mutex::new(TimedCache::with_lifespan(60 * 10)),
-            overbuff_cache: Mutex::new(TimedCache::with_lifespan(60 * 10)),
-            search_cache: Mutex::new(TimedCache::with_lifespan(60 * 10)),
+            profile_cache: Mutex::new(TimedCache::with_lifespan(60 * 20)),
+            overbuff_cache: Mutex::new(TimedCache::with_lifespan(60 * 20)),
+            search_cache: Mutex::new(TimedCache::with_lifespan(60 * 20)),
         })
     }
 
@@ -67,7 +67,7 @@ impl CachedClient {
     #[allow(clippy::unit_arg)]
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::let_unit_value)]
-    pub async fn overbuff(&self, btag: &Battletag) -> crate::Result<()> {
+    pub async fn overbuff(&self, btag: &Battletag) -> crate::Result<Overbuff> {
         {
             let mut cache = self.overbuff_cache.lock();
             if let Some(profile) = cache.cache_get(btag) {
