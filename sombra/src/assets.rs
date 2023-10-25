@@ -104,7 +104,7 @@ pub enum ContentType {
 }
 
 impl Client {
-    #[instrument(skip(self))]
+    #[instrument(level = "debug", skip(self))]
     pub async fn assets(&self) -> crate::Result<HashMap<Id, Asset>> {
         let html = self
             .get("https://overwatch.blizzard.com/en-us/search/")
@@ -124,7 +124,7 @@ impl Client {
     }
 }
 
-#[instrument(skip_all)]
+#[instrument(level = "debug", skip_all)]
 fn parse_json_var<'de, T: serde::Deserialize<'de>>(js: &'de str) -> crate::Result<T> {
     let json = js
         .split('=')
