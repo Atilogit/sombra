@@ -32,8 +32,7 @@ impl Error {
     }
 
     #[must_use]
-    pub fn parse() -> Self {
-        panic!("parse error");
+    pub const fn parse() -> Self {
         Self::Parse
     }
 }
