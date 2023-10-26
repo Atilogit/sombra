@@ -6,10 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+poem-openapi = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+
 serde.workspace = true
 serde_derive.workspace = true
-serde_json.workspace = true
 url.workspace = true
 chrono.workspace = true
-poem-openapi.workspace = true
 bounded-integer = { version = "0.5", features = ["macro", "serde1"] }
+
+[features]
+default = ["poem_openapi"]
+poem_openapi = ["dep:poem-openapi", "dep:serde_json"]

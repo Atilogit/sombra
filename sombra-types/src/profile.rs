@@ -1,8 +1,5 @@
 use chrono::{DateTime, Utc};
-use poem_openapi::types::{ParseFromJSON, ToJSON, Type};
-use poem_openapi::{Enum, Object};
 use serde_derive::{Deserialize, Serialize};
-use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fmt::Display;
 use std::str::FromStr;
@@ -11,7 +8,8 @@ use url::Url;
 
 use crate::Battletag;
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Object)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayerProfile {
     pub battletag: Battletag,
@@ -27,7 +25,8 @@ pub struct PlayerProfile {
     pub competitive_pc: HashMap<String, HeroStats>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Object)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayerProfileReduced {
     pub battletag: Battletag,
@@ -40,11 +39,12 @@ pub struct PlayerProfileReduced {
 }
 
 bounded_integer::bounded_integer! {
-    #[derive(poem_openapi::NewType)]
+    #[cfg_attr(feature = "poem_openapi", derive(poem_openapi::NewType))]
     pub struct Endorsement{ 1..=5 }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Object)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Rank {
     pub group: Group,
@@ -53,16 +53,16 @@ pub struct Rank {
     pub console: bool,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Enum)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Enum))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Role {
     Tank,
     Damage,
     Support,
 }
 
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord, Enum,
-)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Enum))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
 pub enum Group {
     Bronze,
     Silver,
@@ -74,11 +74,12 @@ pub enum Group {
 }
 
 bounded_integer::bounded_integer! {
-    #[derive(poem_openapi::NewType)]
+    #[cfg_attr(feature = "poem_openapi", derive(poem_openapi::NewType))]
     pub struct Division{ 1..=5 }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Object)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct HeroStats {
     pub stats: HashMap<String, Stat>,
 }
@@ -110,7 +111,8 @@ impl From<&PlayerProfile> for PlayerProfileReduced {
     }
 }
 
-impl Type for Stat {
+#[cfg(feature = "poem_openapi")]
+impl poem_openapi::types::Type for Stat {
     const IS_REQUIRED: bool = true;
 
     type RawValueType = Self;
@@ -118,7 +120,7 @@ impl Type for Stat {
     type RawElementValueType = Self;
 
     fn name() -> std::borrow::Cow<'static, str> {
-        Cow::Borrowed("Stat")
+        std::borrow::Cow::Borrowed("Stat")
     }
 
     fn schema_ref() -> poem_openapi::registry::MetaSchemaRef {
@@ -126,6 +128,7 @@ impl Type for Stat {
     }
 
     fn register(registry: &mut poem_openapi::registry::Registry) {
+        use poem_openapi::types::ToJSON;
         registry.create_schema::<Self, _>(Self::name().into_owned(), |_| {
             poem_openapi::registry::MetaSchema {
                 description: None,
@@ -159,7 +162,8 @@ impl Type for Stat {
     }
 }
 
-impl ParseFromJSON for Stat {
+#[cfg(feature = "poem_openapi")]
+impl poem_openapi::types::ParseFromJSON for Stat {
     fn parse_from_json(value: Option<serde_json::Value>) -> poem_openapi::types::ParseResult<Self> {
         let value = value.ok_or_else(poem_openapi::types::ParseError::expected_input)?;
         match value {
@@ -170,7 +174,8 @@ impl ParseFromJSON for Stat {
     }
 }
 
-impl ToJSON for Stat {
+#[cfg(feature = "poem_openapi")]
+impl poem_openapi::types::ToJSON for Stat {
     fn to_json(&self) -> Option<serde_json::Value> {
         Some(serde_json::Value::String(self.to_string()))
     }

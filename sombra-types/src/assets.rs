@@ -2,16 +2,17 @@ use std::fmt::Debug;
 use std::str::FromStr;
 use std::{collections::HashMap, fmt::Display};
 
-use poem_openapi::{Enum, NewType, Object};
 use serde_derive::{Deserialize, Serialize};
 use url::Url;
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, NewType)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::NewType))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(try_from = "String")]
 #[serde(into = "u64")]
 pub struct Id(u64);
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Object)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[serde(deny_unknown_fields)]
 pub struct Asset {
@@ -29,7 +30,8 @@ pub struct Asset {
     pub icon: Option<Url>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Object)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[serde(deny_unknown_fields)]
 pub struct Data {
@@ -48,21 +50,24 @@ pub struct Data {
     pub video_mp4: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Object)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct IdName {
     pub id: Option<Id>,
     pub name: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Object)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Rarity {
     pub name: RarityTypes,
     pub value: i64,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Enum)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Enum))]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[serde(deny_unknown_fields)]
 pub enum RarityTypes {
@@ -71,7 +76,8 @@ pub enum RarityTypes {
     Rare,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Object)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Release {
     pub id: Id,
@@ -80,7 +86,8 @@ pub struct Release {
     pub title: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Enum)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Enum))]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[serde(deny_unknown_fields)]
 pub enum Category {
@@ -89,7 +96,8 @@ pub enum Category {
     Titles,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Enum)]
+#[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Enum))]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[serde(deny_unknown_fields)]
 pub enum ContentType {
