@@ -22,7 +22,7 @@ pub use sombra_types::*;
 
 use tracing::instrument;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Client {
     client: reqwest::Client,
     assets: HashMap<Id, Asset>,

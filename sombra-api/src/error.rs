@@ -1,24 +1,25 @@
-use axum::{http::StatusCode, response::IntoResponse};
-use thiserror::Error;
+use poem::http::StatusCode;
+use poem_openapi::ApiResponse;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug, Error)]
+#[derive(Debug, ApiResponse)]
 pub enum Error {
-    #[error(transparent)]
-    Sombra(#[from] sombra::Error),
+    #[oai(status = 500)]
+    Internal,
+    #[oai(status = 404)]
+    NotFound,
 }
 
-impl IntoResponse for Error {
-    fn into_response(self) -> axum::response::Response {
-        match self {
-            Self::Sombra(e) => match e {
-                sombra::Error::Http(status) => status.into_response(),
-                sombra::Error::Request(_)
-                | sombra::Error::Deserializer(_)
-                | sombra::Error::Html(_)
-                | sombra::Error::Parse => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
-            },
+impl From<sombra::Error> for Error {
+    fn from(e: sombra::Error) -> Self {
+        match e {
+            sombra::Error::Http(StatusCode::NOT_FOUND) => Self::NotFound,
+            sombra::Error::Http(_)
+            | sombra::Error::Request(_)
+            | sombra::Error::Deserializer(_)
+            | sombra::Error::Html(_)
+            | sombra::Error::Parse => Self::Internal,
         }
     }
 }

@@ -3,9 +3,10 @@ use std::{
     str::FromStr,
 };
 
+use poem_openapi::Object;
 use serde_derive::{Deserialize, Serialize};
 
-#[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Object)]
 #[serde(rename_all = "camelCase")]
 #[serde(try_from = "String")]
 #[serde(into = "String")]

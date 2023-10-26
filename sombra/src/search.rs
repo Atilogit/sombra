@@ -1,4 +1,4 @@
-use chrono::{serde::ts_seconds, DateTime, Utc};
+use chrono::{DateTime, Utc};
 use serde_derive::{Deserialize, Serialize};
 use sombra_types::{Battletag, FoundPlayer};
 use tracing::instrument;
@@ -9,7 +9,7 @@ use crate::{Client, Id};
 #[serde(rename_all = "camelCase")]
 struct FoundPlayerRaw {
     pub battle_tag: Battletag,
-    #[serde(with = "ts_seconds")]
+    #[serde(with = "chrono::serde::ts_seconds")]
     pub last_updated: DateTime<Utc>,
     pub is_public: bool,
     pub frame: Option<Id>,

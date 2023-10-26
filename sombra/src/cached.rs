@@ -1,6 +1,10 @@
+use std::collections::HashMap;
+
 use cached::{Cached, TimedCache};
 use parking_lot::Mutex;
-use sombra_types::{Battletag, FoundPlayer, Overbuff, PlayerProfile, PlayerProfileReduced};
+use sombra_types::{
+    Asset, Battletag, FoundPlayer, Id, Overbuff, PlayerProfile, PlayerProfileReduced,
+};
 
 use crate::Client;
 
@@ -49,9 +53,6 @@ impl CachedClient {
         Ok(reduced)
     }
 
-    #[allow(clippy::unit_arg)]
-    #[allow(clippy::clone_on_copy)]
-    #[allow(clippy::let_unit_value)]
     pub async fn overbuff(&self, btag: &Battletag) -> crate::Result<Overbuff> {
         {
             let mut cache = self.overbuff_cache.lock();
@@ -78,5 +79,9 @@ impl CachedClient {
             .lock()
             .cache_set(name.to_owned(), search.clone());
         Ok(search)
+    }
+
+    pub const fn assets(&self) -> &HashMap<Id, Asset> {
+        self.client.assets()
     }
 }

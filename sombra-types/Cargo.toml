@@ -8,6 +8,8 @@ edition = "2021"
 [dependencies]
 serde.workspace = true
 serde_derive.workspace = true
+serde_json.workspace = true
 url.workspace = true
 chrono.workspace = true
+poem-openapi.workspace = true
 bounded-integer = { version = "0.5", features = ["macro", "serde1"] }

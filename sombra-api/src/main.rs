@@ -1,54 +1,101 @@
-mod error;
+#![allow(clippy::unused_async)]
+#![allow(clippy::useless_let_if_seq)]
 
-use std::sync::Arc;
+mod error;
 
 use error::Result;
 
-use axum::{
-    extract::{Path, State},
-    routing::get,
-    Json, Router,
+use std::{collections::HashMap, sync::Arc};
+
+use poem::{middleware, EndpointExt, Route};
+use poem_openapi::{
+    param::{Path, Query},
+    payload::Json,
+    ContactObject, OpenApi, OpenApiService, Tags,
 };
-use sombra::{Battletag, CachedClient, FoundPlayer, Overbuff, PlayerProfile, PlayerProfileReduced};
+use shuttle_poem::ShuttlePoem;
+use sombra::{
+    Asset, Battletag, CachedClient, FoundPlayer, Id, Overbuff, PlayerProfile, PlayerProfileReduced,
+};
 
-async fn search(
-    State(client): State<Arc<CachedClient>>,
-    Path(name): Path<String>,
-) -> Result<Json<Vec<FoundPlayer>>> {
-    Ok(Json(client.search(&name).await?))
+struct Api {
+    client: Arc<CachedClient>,
 }
 
-async fn profile_full(
-    State(client): State<Arc<CachedClient>>,
-    Path(btag): Path<Battletag>,
-) -> Result<Json<PlayerProfile>> {
-    Ok(Json(client.profile_full(&btag).await?))
+#[derive(Tags)]
+enum ApiTags {
+    V1,
 }
 
-async fn profile(
-    State(client): State<Arc<CachedClient>>,
-    Path(btag): Path<Battletag>,
-) -> Result<Json<PlayerProfileReduced>> {
-    Ok(Json(client.profile(&btag).await?))
-}
+#[OpenApi(prefix_path = "/v1", tag = "ApiTags::V1")]
+impl Api {
+    async fn new() -> Self {
+        Self {
+            client: Arc::new(CachedClient::new().await.unwrap()),
+        }
+    }
 
-async fn overbuff(
-    State(client): State<Arc<CachedClient>>,
-    Path(btag): Path<Battletag>,
-) -> Result<Json<Overbuff>> {
-    Ok(Json(client.overbuff(&btag).await?))
+    #[oai(path = "/search/:name", method = "get")]
+    async fn search(&self, Path(name): Path<String>) -> Result<Json<Vec<FoundPlayer>>> {
+        Ok(Json(self.client.search(&name).await?))
+    }
+
+    #[oai(path = "/profile", method = "get")]
+    async fn profile(
+        &self,
+        Query(name): Query<String>,
+        Query(number): Query<u64>,
+    ) -> Result<Json<PlayerProfileReduced>> {
+        let btag = Battletag::new(name, number);
+        Ok(Json(self.client.profile(&btag).await?))
+    }
+
+    #[oai(path = "/profile_full", method = "get")]
+    async fn profile_full(
+        &self,
+        Query(name): Query<String>,
+        Query(number): Query<u64>,
+    ) -> Result<Json<PlayerProfile>> {
+        let btag = Battletag::new(name, number);
+        Ok(Json(self.client.profile_full(&btag).await?))
+    }
+
+    #[oai(path = "/overbuff", method = "get")]
+    async fn overbuff(
+        &self,
+        Query(name): Query<String>,
+        Query(number): Query<u64>,
+    ) -> Result<Json<Overbuff>> {
+        let btag = Battletag::new(name, number);
+        Ok(Json(self.client.overbuff(&btag).await?))
+    }
+
+    #[oai(path = "/assets", method = "get")]
+    async fn assets(&self) -> Json<&HashMap<Id, Asset>> {
+        Json(self.client.assets())
+    }
 }
 
 #[shuttle_runtime::main]
-#[allow(clippy::unused_async)]
-async fn main() -> shuttle_axum::ShuttleAxum {
-    let client = Arc::new(CachedClient::new().await.unwrap());
-    let router = Router::new()
-        .route("/search/:name", get(search))
-        .route("/profile_full/:battletag", get(profile_full))
-        .route("/profile/:battletag", get(profile))
-        .route("/overbuff/:battletag", get(overbuff))
-        .with_state(client);
+async fn poem() -> ShuttlePoem<impl poem::Endpoint> {
+    let api_service = OpenApiService::new(Api::new().await, "Sombra", env!("CARGO_PKG_VERSION"))
+        .contact(
+            ContactObject::new()
+                .url("https://atilo.sh")
+                .name("by atilo"),
+        )
+        .url_prefix("/api")
+        .external_document("https://github.com/Atilogit/sombra");
+    let ui = api_service.swagger_ui();
+    let spec_json = api_service.spec_endpoint();
+    let spec_yaml = api_service.spec_endpoint_yaml();
+    let app = Route::new()
+        .nest("/api", api_service)
+        .nest("/docs", ui)
+        .nest("/spec.json", spec_json)
+        .nest("/spec.yaml", spec_yaml)
+        .with(middleware::Compression::new())
+        .with(middleware::Tracing);
 
-    Ok(router.into())
+    Ok(app.into())
 }
