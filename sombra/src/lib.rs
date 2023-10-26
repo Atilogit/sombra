@@ -3,7 +3,6 @@
 #![allow(clippy::map_err_ignore)]
 
 mod assets;
-mod btag;
 mod cached;
 mod error;
 mod overbuff;
@@ -14,12 +13,13 @@ mod util;
 use std::collections::HashMap;
 
 pub use assets::*;
-pub use btag::*;
 pub use cached::*;
 pub use error::*;
 pub use overbuff::*;
 pub use profile::*;
 pub use search::*;
+pub use sombra_types::*;
+
 use tracing::instrument;
 
 #[derive(Debug, Clone)]

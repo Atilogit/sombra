@@ -1,15 +1,13 @@
-mod types;
-
 use crate::util::{
     find, find2, find_all, find_all2, find_attr, find_attr2, find_inner_text, find_inner_text2,
     url_file,
 };
-use crate::{Battletag, Client, Error};
+use crate::{Client, Error};
 use chrono::{DateTime, TimeZone, Utc};
+use sombra_types::{Battletag, Division, Endorsement, Group, HeroStats, PlayerProfile, Rank, Role};
 use std::collections::HashMap;
 use tl::{ParserOptions, VDom};
 use tracing::instrument;
-pub use types::*;
 use url::Url;
 
 impl Client {

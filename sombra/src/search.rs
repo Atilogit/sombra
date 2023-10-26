@@ -1,40 +1,26 @@
-use std::collections::HashMap;
-
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde_derive::{Deserialize, Serialize};
+use sombra_types::{Battletag, FoundPlayer};
 use tracing::instrument;
-use url::Url;
 
-use crate::{Battletag, Client, Id};
+use crate::{Client, Id};
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct FoundPlayer {
+struct FoundPlayerRaw {
     pub battle_tag: Battletag,
     #[serde(with = "ts_seconds")]
     pub last_updated: DateTime<Utc>,
     pub is_public: bool,
-    pub namecard: Option<Url>,
-    pub portrait: Option<Url>,
-    pub title: Option<HashMap<String, String>>,
+    pub frame: Option<Id>,
+    pub namecard: Option<Id>,
+    pub portrait: Option<Id>,
+    pub title: Option<Id>,
 }
 
 impl Client {
     #[instrument(level = "debug", skip(self))]
     pub async fn search(&self, name: &str) -> crate::Result<Vec<FoundPlayer>> {
-        #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-        #[serde(rename_all = "camelCase")]
-        struct FoundPlayerRaw {
-            pub battle_tag: Battletag,
-            #[serde(with = "ts_seconds")]
-            pub last_updated: DateTime<Utc>,
-            pub is_public: bool,
-            pub frame: Option<Id>,
-            pub namecard: Option<Id>,
-            pub portrait: Option<Id>,
-            pub title: Option<Id>,
-        }
-
         let url = "https://overwatch.blizzard.com/en-us/search/account-by-name/";
         let raw: Vec<FoundPlayerRaw> =
             serde_json::from_str(&self.get(&format!("{url}{name}")).await?)?;

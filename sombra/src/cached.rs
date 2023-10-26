@@ -1,23 +1,8 @@
 use cached::{Cached, TimedCache};
-use chrono::{serde::ts_seconds, DateTime, Utc};
 use parking_lot::Mutex;
-use serde_derive::{Deserialize, Serialize};
-use url::Url;
+use sombra_types::{Battletag, FoundPlayer, Overbuff, PlayerProfile, PlayerProfileReduced};
 
-use crate::{Battletag, Client, Endorsement, FoundPlayer, Overbuff, PlayerProfile, Rank};
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PlayerProfileReduced {
-    pub battletag: Battletag,
-    pub title: Option<String>,
-    pub endorsement: Endorsement,
-    pub portrait: Url,
-    pub ranks: Vec<Rank>,
-    pub private: bool,
-    #[serde(with = "ts_seconds")]
-    pub last_updated: DateTime<Utc>,
-}
+use crate::Client;
 
 #[derive(Debug)]
 pub struct CachedClient {
@@ -93,19 +78,5 @@ impl CachedClient {
             .lock()
             .cache_set(name.to_owned(), search.clone());
         Ok(search)
-    }
-}
-
-impl From<&PlayerProfile> for PlayerProfileReduced {
-    fn from(value: &PlayerProfile) -> Self {
-        Self {
-            battletag: value.battletag.clone(),
-            title: value.title.clone(),
-            endorsement: value.endorsement,
-            portrait: value.portrait.clone(),
-            ranks: value.ranks.clone(),
-            private: value.private,
-            last_updated: value.last_updated,
-        }
     }
 }

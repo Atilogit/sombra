@@ -1,16 +1,11 @@
-use serde_derive::{Deserialize, Serialize};
+use sombra_types::{Battletag, Division, Group, Overbuff, Rank, Role};
 use tl::ParserOptions;
 use tracing::instrument;
 
 use crate::{
     util::{find2, find_all, find_all2, find_attr2},
-    Battletag, Client, Division, Error, Group, Rank, Role,
+    Client, Error,
 };
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct Overbuff {
-    pub ranks: Vec<Rank>,
-}
 
 impl Client {
     #[instrument(level = "debug", skip(self))]

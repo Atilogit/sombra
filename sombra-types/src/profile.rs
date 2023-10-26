@@ -26,6 +26,19 @@ pub struct PlayerProfile {
     pub competitive_pc: HashMap<String, HeroStats>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PlayerProfileReduced {
+    pub battletag: Battletag,
+    pub title: Option<String>,
+    pub endorsement: Endorsement,
+    pub portrait: Url,
+    pub ranks: Vec<Rank>,
+    pub private: bool,
+    #[serde(with = "ts_seconds")]
+    pub last_updated: DateTime<Utc>,
+}
+
 bounded_integer::bounded_integer! {
     pub struct Endorsement{ 1..=5 }
 }
@@ -82,6 +95,7 @@ impl Display for Rank {
 impl FromStr for Stat {
     type Err = ();
 
+    #[allow(clippy::map_err_ignore)]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.ends_with('%') {
             Ok(Self::Number(
@@ -107,6 +121,20 @@ impl FromStr for Stat {
             }
         } else {
             Ok(Self::Number(s.parse().map_err(|_| ())?))
+        }
+    }
+}
+
+impl From<&PlayerProfile> for PlayerProfileReduced {
+    fn from(value: &PlayerProfile) -> Self {
+        Self {
+            battletag: value.battletag.clone(),
+            title: value.title.clone(),
+            endorsement: value.endorsement,
+            portrait: value.portrait.clone(),
+            ranks: value.ranks.clone(),
+            private: value.private,
+            last_updated: value.last_updated,
         }
     }
 }

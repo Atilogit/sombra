@@ -654,7 +654,6 @@ checksum = "23342abe12aba583913b2e62f22225ff9c950774065e4bfb61a19cd9770fec40"
 dependencies = [
  "futures-channel",
  "futures-core",
- "futures-executor",
  "futures-io",
  "futures-sink",
  "futures-task",
@@ -2157,20 +2156,17 @@ dependencies = [
 name = "sombra"
 version = "0.1.0"
 dependencies = [
- "bounded-integer",
  "cached",
  "chrono",
- "futures",
  "parking_lot",
  "reqwest",
  "serde",
  "serde_derive",
  "serde_json",
+ "sombra-types",
  "thiserror",
  "tl",
- "tokio",
  "tracing",
- "tracing-subscriber",
  "url",
 ]
 
@@ -2179,8 +2175,6 @@ name = "sombra-api"
 version = "0.1.0"
 dependencies = [
  "axum",
- "chrono",
- "futures",
  "serde",
  "serde_derive",
  "shuttle-axum",
@@ -2188,6 +2182,23 @@ dependencies = [
  "sombra",
  "thiserror",
  "tokio",
+]
+
+[[package]]
+name = "sombra-client"
+version = "0.1.0"
+dependencies = [
+ "sombra-types",
+]
+
+[[package]]
+name = "sombra-types"
+version = "0.1.0"
+dependencies = [
+ "bounded-integer",
+ "chrono",
+ "serde",
+ "serde_derive",
  "url",
 ]
 

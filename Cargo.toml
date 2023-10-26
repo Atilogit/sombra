@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["sombra", "sombra-api"]
+members = ["sombra", "sombra-api", "sombra-client", "sombra-types"]
 
 [profile.release]
 debug = true

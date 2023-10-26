@@ -1,0 +1,13 @@
+[package]
+name = "sombra-types"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde.workspace = true
+serde_derive.workspace = true
+url.workspace = true
+chrono.workspace = true
+bounded-integer = { version = "0.5", features = ["macro", "serde1"] }

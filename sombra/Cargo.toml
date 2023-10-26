@@ -6,20 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bounded-integer = { version = "0.5", features = ["macro", "serde1"] }
-tl = "0.7"
-reqwest = { version = "0.11", features = ["gzip", "brotli", "deflate"] }
+sombra-types = { path = "../sombra-types" }
 serde.workspace = true
 serde_derive.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
-tokio = { version = "1.25", features = ["full"] }
-futures.workspace = true
 chrono.workspace = true
 url.workspace = true
+tl = "0.7"
+reqwest = { version = "0.11", features = ["gzip", "brotli", "deflate"] }
 tracing = "0.1"
 cached = { version = "0.46", features = ["async"] }
 parking_lot = "0.12"
-
-[dev-dependencies]
-tracing-subscriber = "0.3"
