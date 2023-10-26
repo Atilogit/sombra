@@ -85,7 +85,8 @@ async fn poem() -> ShuttlePoem<impl poem::Endpoint> {
                 .name("by atilo"),
         )
         .url_prefix("/api")
-        .external_document("https://github.com/Atilogit/sombra");
+        .external_document("https://github.com/Atilogit/sombra")
+        .license("MIT License");
     let ui = api_service.swagger_ui();
     let spec_json = api_service.spec_endpoint();
     let spec_yaml = api_service.spec_endpoint_yaml();
