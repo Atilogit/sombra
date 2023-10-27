@@ -21,8 +21,8 @@ impl Client {
     }
 
     pub async fn search(&self, name: &str) -> Result<Vec<FoundPlayer>> {
-        let url = format!("{}/api/v1/search/{}", self.url, name);
-        let response = self.client.get(url).send().await?;
+        let url = format!("{}/api/v1/search", self.url);
+        let response = self.client.get(url).query(&[("name", name)]).send().await?;
         Error::result_from_status(response.status(), None)?;
         Ok(serde_json::from_str(&response.text().await?)?)
     }

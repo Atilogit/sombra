@@ -8,11 +8,7 @@ use error::Result;
 use std::{collections::HashMap, sync::Arc};
 
 use poem::{middleware, EndpointExt, Route};
-use poem_openapi::{
-    param::{Path, Query},
-    payload::Json,
-    ContactObject, OpenApi, OpenApiService, Tags,
-};
+use poem_openapi::{param::Query, payload::Json, ContactObject, OpenApi, OpenApiService, Tags};
 use shuttle_poem::ShuttlePoem;
 use sombra::{
     Asset, Battletag, CachedClient, FoundPlayer, Id, Overbuff, PlayerProfile, PlayerProfileReduced,
@@ -35,8 +31,8 @@ impl Api {
         }
     }
 
-    #[oai(path = "/search/:name", method = "get")]
-    async fn search(&self, Path(name): Path<String>) -> Result<Json<Vec<FoundPlayer>>> {
+    #[oai(path = "/search", method = "get")]
+    async fn search(&self, Query(name): Query<String>) -> Result<Json<Vec<FoundPlayer>>> {
         Ok(Json(self.client.search(&name).await?))
     }
 
