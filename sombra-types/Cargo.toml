@@ -16,5 +16,4 @@ chrono.workspace = true
 bounded-integer = { version = "0.5", features = ["macro", "serde1"] }
 
 [features]
-default = ["poem_openapi"]
 poem_openapi = ["dep:poem-openapi", "dep:serde_json"]

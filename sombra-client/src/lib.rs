@@ -3,8 +3,7 @@
 mod error;
 
 pub use error::*;
-
-use sombra_types::{Battletag, FoundPlayer, Overbuff, PlayerProfile, PlayerProfileReduced};
+pub use sombra_types::*;
 
 pub struct Client {
     url: String,
