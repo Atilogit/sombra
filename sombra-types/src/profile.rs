@@ -88,6 +88,7 @@ pub struct HeroStats {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(try_from = "String", into = "String")]
 pub enum Stat {
     Number(f64),
     Duration(Duration),
@@ -238,5 +239,19 @@ impl Display for Stat {
             }
             Self::Percentage(p) => write!(f, "{p}%"),
         }
+    }
+}
+
+impl TryFrom<String> for Stat {
+    type Error = String;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        value.parse().map_err(|()| value)
+    }
+}
+
+impl From<Stat> for String {
+    fn from(val: Stat) -> Self {
+        val.to_string()
     }
 }
