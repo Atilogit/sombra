@@ -26,9 +26,11 @@ impl Client {
             serde_json::from_str(&self.get(&format!("{url}{name}")).await?)?;
         raw.into_iter()
             .map(|f| {
-                let namecard = f.namecard.and_then(|id| self.assets[&id].icon.clone());
-                let portrait = f.portrait.and_then(|id| self.assets[&id].icon.clone());
-                let title = f.title.map(|id| self.assets[&id].name.clone());
+                let namecard = f.namecard.and_then(|id| self.assets.get(&id)?.icon.clone());
+                let portrait = f.portrait.and_then(|id| self.assets.get(&id)?.icon.clone());
+                let title = f
+                    .title
+                    .and_then(|id| Some(self.assets.get(&id)?.name.clone()));
                 Ok(FoundPlayer {
                     battle_tag: f.battle_tag.try_into().map_err(Error::Battletag)?,
                     last_updated: f.last_updated,

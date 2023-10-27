@@ -8,7 +8,7 @@ use std::str::FromStr;
 use leptos::*;
 use leptos_use::storage::use_storage;
 use serde_derive::{Deserialize, Serialize};
-use sombra_client::{Battletag, Client, FoundPlayer, Overbuff, PlayerProfile};
+use sombra_client::{Battletag, Client, FoundPlayer, Overbuff, PlayerProfile, Rank};
 
 fn main() {
     leptos::mount_to_body(|| view! { <App/> });
@@ -20,6 +20,31 @@ struct Player {
     profile: Option<PlayerProfile>,
     overbuff: Option<Overbuff>,
     found: FoundPlayer,
+}
+
+impl Player {
+    fn namecard_url(&self) -> String {
+        self.found
+            .namecard
+            .as_ref()
+            .map_or(String::new(), std::string::ToString::to_string)
+    }
+
+    fn title(&self) -> String {
+        self.found
+            .title
+            .as_ref()
+            .map_or(String::new(), |t| t["en_US"].clone())
+    }
+
+    fn ranks(&self) -> Vec<Rank> {
+        self.overbuff
+            .as_ref()
+            .map(|p| &p.ranks)
+            .or_else(|| self.profile.as_ref().map(|p| &p.ranks))
+            .cloned()
+            .unwrap_or(Vec::new())
+    }
 }
 
 #[component]
@@ -42,7 +67,10 @@ fn App() -> impl IntoView {
                 .and_then(|v| v.into_iter().find(|p| p.battle_tag == btag));
             if let Some(found) = found {
                 let profile = client.profile_full(&btag).await.ok();
-                let overbuff = if profile.is_none() {
+                let overbuff = if profile.is_none()
+                    || !found.is_public
+                    || profile.as_ref().is_some_and(|p| p.ranks.is_empty())
+                {
                     client.overbuff(&btag).await.ok()
                 } else {
                     None
@@ -94,29 +122,20 @@ fn App() -> impl IntoView {
 
 #[component]
 fn PlayerView<'pl>(player: &'pl Player) -> impl IntoView {
-    let namecard_url = player
-        .found
-        .namecard
-        .as_ref()
-        .map_or(String::new(), std::string::ToString::to_string);
-    let ranks = player
-        .profile
-        .as_ref()
-        .map(|p| &p.ranks)
-        .or_else(|| player.overbuff.as_ref().map(|p| &p.ranks))
-        .cloned()
-        .unwrap_or(Vec::new());
     view! {
         <div class="card bg-base-100 shadow-xl image-full">
-            <figure><img src=namecard_url /></figure>
+            <figure><img src=player.namecard_url() /></figure>
             <div class="card-body">
                 <div class="flex justify-between">
-                    <h2 class="card-title">{ player.btag.to_string() }</h2>
                     <div>
+                        <h2 class="text-xl font-bold">{ player.btag.to_string() }</h2>
+                        <h3 class="text-large">{ player.title() }</h3>
+                    </div>
+                    <div class="flex flex-row-reverse flex-wrap">
                         {
-                            ranks.into_iter().map(|r| {
+                            player.ranks().into_iter().map(|r| {
                                 view! {
-                                    <div class="badge badge-accent ml-3">
+                                    <div class="badge badge-accent ml-3 flex-none">
                                         { format!("{:?} {:?} {}", r.role, r.group, r.division) }
                                     </div>
                                 }
