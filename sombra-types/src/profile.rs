@@ -57,7 +57,7 @@ pub struct Rank {
 }
 
 #[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Enum))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum Role {
     Tank,
     Damage,

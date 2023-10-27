@@ -8,7 +8,9 @@ use std::str::FromStr;
 use leptos::*;
 use leptos_use::storage::use_storage;
 use serde_derive::{Deserialize, Serialize};
-use sombra_client::{Battletag, Client, FoundPlayer, Overbuff, PlayerProfile, Rank};
+use sombra_client::{
+    Battletag, Client, Division, FoundPlayer, Group, Overbuff, PlayerProfile, Rank, Role,
+};
 
 fn main() {
     leptos::mount_to_body(|| view! { <App/> });
@@ -38,12 +40,16 @@ impl Player {
     }
 
     fn ranks(&self) -> Vec<Rank> {
-        self.overbuff
+        let mut ranks = self
+            .overbuff
             .as_ref()
             .map(|p| &p.ranks)
             .or_else(|| self.profile.as_ref().map(|p| &p.ranks))
             .cloned()
-            .unwrap_or(Vec::new())
+            .unwrap_or(Vec::new());
+        ranks.sort_by_key(|r| r.role);
+        ranks.reverse();
+        ranks
     }
 }
 
@@ -135,8 +141,13 @@ fn PlayerView<'pl>(player: &'pl Player) -> impl IntoView {
                         {
                             player.ranks().into_iter().map(|r| {
                                 view! {
-                                    <div class="badge badge-accent ml-3 flex-none">
-                                        { format!("{:?} {:?} {}", r.role, r.group, r.division) }
+                                    <div class="flex-none">
+                                        <div class="w-8 ml-5 inline-block drop-shadow-lg text-center">
+                                            <img src=role_icon_url(r.role) class="h-8 inline-block" />
+                                        </div>
+                                        <div class="w-14 inline-block drop-shadow-lg text-center">
+                                            <img src=rank_icon_url(r.group, r.division) class="h-12 inline-block" />
+                                        </div>
                                     </div>
                                 }
                             }).collect_view()
@@ -146,4 +157,19 @@ fn PlayerView<'pl>(player: &'pl Player) -> impl IntoView {
             </div>
         </div>
     }
+}
+
+const fn role_icon_url(role: Role) -> &'static str {
+    match role {
+        Role::Damage => "https://static.playoverwatch.com/img/pages/career/icons/role/offense-ab1756f419.svg#icon",
+        Role::Tank => "https://static.playoverwatch.com/img/pages/career/icons/role/tank-f64702b684.svg#icon",
+        Role::Support => "https://static.playoverwatch.com/img/pages/career/icons/role/support-0258e13d85.svg#icon",
+    }
+}
+
+fn rank_icon_url(group: Group, division: Division) -> String {
+    let group = format!("{group:?}",).to_lowercase();
+    format!(
+        "https://www.overbuff.com/_next/image?url=%2FskillDivisions%2F{group}-{division}.png&w=750&q=75"
+    )
 }
