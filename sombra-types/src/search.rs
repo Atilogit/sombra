@@ -8,6 +8,7 @@ use crate::Battletag;
 
 #[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "poem_openapi", oai(rename_all = "camelCase"))]
 #[serde(rename_all = "camelCase")]
 pub struct FoundPlayer {
     pub battle_tag: Battletag,

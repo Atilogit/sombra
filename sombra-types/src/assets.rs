@@ -13,6 +13,7 @@ pub struct Id(u64);
 
 #[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "poem_openapi", oai(rename_all = "camelCase"))]
 #[serde(rename_all = "camelCase")]
 #[serde(deny_unknown_fields)]
 pub struct Asset {
@@ -32,6 +33,7 @@ pub struct Asset {
 
 #[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "poem_openapi", oai(rename_all = "camelCase"))]
 #[serde(rename_all = "camelCase")]
 #[serde(deny_unknown_fields)]
 pub struct Data {
@@ -88,6 +90,7 @@ pub struct Release {
 
 #[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Enum))]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "poem_openapi", oai(rename_all = "camelCase"))]
 #[serde(rename_all = "camelCase")]
 #[serde(deny_unknown_fields)]
 pub enum Category {
@@ -98,6 +101,7 @@ pub enum Category {
 
 #[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Enum))]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "poem_openapi", oai(rename_all = "camelCase"))]
 #[serde(rename_all = "camelCase")]
 #[serde(deny_unknown_fields)]
 pub enum ContentType {

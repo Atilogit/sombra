@@ -9,14 +9,8 @@ pub enum Error {
     Request(#[from] reqwest::Error),
     #[error("Error while deserializing: {0}")]
     Deserializer(#[from] serde_json::Error),
-    #[error("Error while deserializing battle tag: {0}")]
-    Battletag(String),
     #[error("HTTP error: {0}")]
     Http(StatusCode),
-    #[error("HTML parsing error: {0}")]
-    Html(#[from] tl::ParseError),
-    #[error("Profile parsing error")]
-    Parse,
 }
 
 impl Error {
@@ -31,11 +25,5 @@ impl Error {
         } else {
             Err(Self::Http(code))
         }
-    }
-
-    #[must_use]
-    pub fn parse() -> Self {
-        eprintln!("{}", std::backtrace::Backtrace::capture());
-        Self::Parse
     }
 }

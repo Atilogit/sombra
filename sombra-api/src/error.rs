@@ -19,7 +19,11 @@ impl From<sombra::Error> for Error {
             | sombra::Error::Request(_)
             | sombra::Error::Deserializer(_)
             | sombra::Error::Html(_)
-            | sombra::Error::Parse => Self::Internal,
+            | sombra::Error::Battletag(_)
+            | sombra::Error::Parse => {
+                tracing::error!(error = ?e, "internal error");
+                Self::Internal
+            }
         }
     }
 }

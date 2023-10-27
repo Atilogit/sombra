@@ -7,9 +7,8 @@ use serde_derive::{Deserialize, Serialize};
 
 #[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
 #[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "poem_openapi", oai(rename_all = "camelCase"))]
 #[serde(rename_all = "camelCase")]
-#[serde(try_from = "String")]
-#[serde(into = "String")]
 pub struct Battletag {
     pub name: String,
     pub number: u64,

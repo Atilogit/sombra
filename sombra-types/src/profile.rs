@@ -10,6 +10,7 @@ use crate::Battletag;
 
 #[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "poem_openapi", oai(rename_all = "camelCase"))]
 #[serde(rename_all = "camelCase")]
 pub struct PlayerProfile {
     pub battletag: Battletag,
@@ -27,6 +28,7 @@ pub struct PlayerProfile {
 
 #[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "poem_openapi", oai(rename_all = "camelCase"))]
 #[serde(rename_all = "camelCase")]
 pub struct PlayerProfileReduced {
     pub battletag: Battletag,
@@ -45,6 +47,7 @@ bounded_integer::bounded_integer! {
 
 #[cfg_attr(feature = "poem_openapi", derive(poem_openapi::Object))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "poem_openapi", oai(rename_all = "camelCase"))]
 #[serde(rename_all = "camelCase")]
 pub struct Rank {
     pub group: Group,

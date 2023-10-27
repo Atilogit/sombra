@@ -13,8 +13,8 @@ serde_json.workspace = true
 thiserror.workspace = true
 chrono.workspace = true
 url.workspace = true
+reqwest.workspace = true
 tl = "0.7"
-reqwest = { version = "0.11", features = ["gzip", "brotli", "deflate"] }
 tracing = "0.1"
 cached = { version = "0.46", features = ["async"] }
 parking_lot = "0.12"

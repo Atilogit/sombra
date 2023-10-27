@@ -7,3 +7,9 @@ edition = "2021"
 
 [dependencies]
 sombra-types = { path = "../sombra-types" }
+reqwest.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+tokio = { version = "1.33", features = ["full"] }

@@ -2544,13 +2544,18 @@ dependencies = [
  "sombra",
  "thiserror",
  "tokio",
+ "tracing",
 ]
 
 [[package]]
 name = "sombra-client"
 version = "0.1.0"
 dependencies = [
+ "reqwest",
+ "serde_json",
  "sombra-types",
+ "thiserror",
+ "tokio",
 ]
 
 [[package]]

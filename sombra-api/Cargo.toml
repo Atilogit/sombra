@@ -13,3 +13,4 @@ tokio = "1.28"
 thiserror.workspace = true
 serde.workspace = true
 serde_derive.workspace = true
+tracing = "0.1"
