@@ -2559,6 +2559,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "sombra-lookup"
+version = "0.1.0"
+
+[[package]]
 name = "sombra-types"
 version = "0.1.0"
 dependencies = [

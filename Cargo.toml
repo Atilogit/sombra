@@ -1,6 +1,12 @@
 [workspace]
 resolver = "2"
-members = ["sombra", "sombra-api", "sombra-client", "sombra-types"]
+members = [
+    "sombra",
+    "sombra-api",
+    "sombra-client",
+    "sombra-types",
+    "sombra-lookup",
+]
 
 [profile.release]
 debug = true
