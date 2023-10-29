@@ -61,4 +61,27 @@ impl Client {
         Error::result_from_status(response.status(), None)?;
         Ok(serde_json::from_str(&response.text().await?)?)
     }
+
+    pub async fn heroes(&self) -> Result<Vec<Hero>> {
+        let url = format!("{}/api/v1/heroes", self.url);
+        let response = self.client.get(url).send().await?;
+        Error::result_from_status(response.status(), None)?;
+        Ok(serde_json::from_str(&response.text().await?)?)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_all() {
+        let client = Client::new("http://localhost:8000");
+        let found = client.search("player").await.unwrap();
+        assert!(!found.is_empty());
+        client.profile(&found[0].battle_tag).await.unwrap();
+        client.profile_full(&found[0].battle_tag).await.unwrap();
+        client.overbuff(&found[0].battle_tag).await.unwrap();
+        client.heroes().await.unwrap();
+    }
 }

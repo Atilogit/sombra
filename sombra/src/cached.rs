@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use cached::{Cached, TimedCache};
 use parking_lot::Mutex;
 use sombra_types::{
-    Asset, Battletag, FoundPlayer, Id, Overbuff, PlayerProfile, PlayerProfileReduced,
+    Asset, Battletag, FoundPlayer, Hero, Id, Overbuff, PlayerProfile, PlayerProfileReduced,
 };
 
 use crate::Client;
@@ -83,5 +83,9 @@ impl CachedClient {
 
     pub const fn assets(&self) -> &HashMap<Id, Asset> {
         self.client.assets()
+    }
+
+    pub fn heroes(&self) -> &[Hero] {
+        self.client.heroes()
     }
 }

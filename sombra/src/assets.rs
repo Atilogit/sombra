@@ -25,6 +25,11 @@ impl Client {
 
         Ok(())
     }
+
+    #[must_use]
+    pub const fn assets(&self) -> &HashMap<Id, Asset> {
+        &self.assets
+    }
 }
 
 #[instrument(level = "debug", skip_all)]

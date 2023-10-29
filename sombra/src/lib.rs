@@ -5,6 +5,7 @@
 mod assets;
 mod cached;
 mod error;
+mod heroes;
 mod overbuff;
 mod profile;
 mod search;
@@ -26,6 +27,7 @@ use tracing::instrument;
 pub struct Client {
     client: reqwest::Client,
     assets: HashMap<Id, Asset>,
+    heroes: Vec<Hero>,
 }
 
 impl Client {
@@ -37,8 +39,10 @@ impl Client {
         let mut s = Self {
             client,
             assets: HashMap::new(),
+            heroes: Vec::new(),
         };
         s.fetch_assets().await?;
+        s.fetch_heroes().await?;
         Ok(s)
     }
 
@@ -47,10 +51,5 @@ impl Client {
         let response = self.client.get(url).send().await?;
         Error::result_from_status(response.status(), None)?;
         Ok(response.text().await?)
-    }
-
-    #[must_use]
-    pub const fn assets(&self) -> &HashMap<Id, Asset> {
-        &self.assets
     }
 }

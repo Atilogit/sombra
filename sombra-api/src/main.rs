@@ -11,7 +11,8 @@ use poem::{middleware, EndpointExt, Route};
 use poem_openapi::{param::Query, payload::Json, ContactObject, OpenApi, OpenApiService, Tags};
 use shuttle_poem::ShuttlePoem;
 use sombra::{
-    Asset, Battletag, CachedClient, FoundPlayer, Id, Overbuff, PlayerProfile, PlayerProfileReduced,
+    Asset, Battletag, CachedClient, FoundPlayer, Hero, Id, Overbuff, PlayerProfile,
+    PlayerProfileReduced,
 };
 
 struct Api {
@@ -69,6 +70,11 @@ impl Api {
     #[oai(path = "/assets", method = "get")]
     async fn assets(&self) -> Json<&HashMap<Id, Asset>> {
         Json(self.client.assets())
+    }
+
+    #[oai(path = "/heroes", method = "get")]
+    async fn heroes(&self) -> Json<&[Hero]> {
+        Json(self.client.heroes())
     }
 }
 

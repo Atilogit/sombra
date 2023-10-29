@@ -35,7 +35,8 @@ impl Error {
 
     #[must_use]
     pub fn parse() -> Self {
-        eprintln!("{}", std::backtrace::Backtrace::capture());
+        let backtrace = std::backtrace::Backtrace::force_capture();
+        tracing::error!(%backtrace, "Parse error");
         Self::Parse
     }
 }
