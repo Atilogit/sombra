@@ -148,14 +148,12 @@ fn ranks<'dom>(dom: &'dom VDom<'dom>) -> crate::Result<Vec<Rank>> {
 }
 
 #[instrument(level = "debug", skip_all)]
-fn endorsement<'dom>(dom: &'dom VDom<'dom>) -> crate::Result<Endorsement> {
+fn endorsement<'dom>(dom: &'dom VDom<'dom>) -> crate::Result<Option<Endorsement>> {
     let endorsement_url =
         find_attr(dom, ".Profile-playerSummary--endorsement", "src").ok_or_else(Error::parse)?;
 
     #[allow(clippy::string_slice)]
-    url_file(&endorsement_url)?[..1]
-        .parse()
-        .map_err(|_| Error::parse())
+    Ok(url_file(&endorsement_url)?[..1].parse().ok())
 }
 
 #[instrument(level = "debug", skip_all)]

@@ -15,7 +15,7 @@ use crate::Battletag;
 pub struct PlayerProfile {
     pub battletag: Battletag,
     pub title: Option<String>,
-    pub endorsement: Endorsement,
+    pub endorsement: Option<Endorsement>,
     pub portrait: Url,
     pub ranks: Vec<Rank>,
     pub private: bool,
@@ -33,7 +33,7 @@ pub struct PlayerProfile {
 pub struct PlayerProfileReduced {
     pub battletag: Battletag,
     pub title: Option<String>,
-    pub endorsement: Endorsement,
+    pub endorsement: Option<Endorsement>,
     pub portrait: Url,
     pub ranks: Vec<Rank>,
     pub private: bool,
