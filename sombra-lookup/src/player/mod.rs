@@ -57,12 +57,76 @@ impl Player {
         self.ranks().into_iter().find(|r| r.role == role)
     }
 
+    #[allow(clippy::cast_sign_loss)]
     pub fn role_stats(&self, role: Role) -> Option<Stats> {
-        None
+        let all = &self.profile.as_ref()?.competitive_pc;
+        let heroes = self
+            .heroes
+            .iter()
+            .filter(|h| h.role == role)
+            .filter_map(|hero| all.get(&hero.name));
+        let time = heroes
+            .clone()
+            .filter_map(|stats| stats.stats.get("Time Played"))
+            .copied()
+            .sum::<Option<Stat>>()
+            .unwrap_or(Stat::Duration(Duration::ZERO))
+            .as_duration()?;
+        let win = heroes
+            .clone()
+            .filter_map(|stats| stats.stats.get("Games Won"))
+            .copied()
+            .sum::<Option<Stat>>()
+            .unwrap_or(Stat::Number(0.))
+            .as_f64()? as usize;
+        let draw = heroes
+            .clone()
+            .filter_map(|stats| stats.stats.get("Games Tied"))
+            .copied()
+            .sum::<Option<Stat>>()
+            .unwrap_or(Stat::Number(0.))
+            .as_f64()? as usize;
+        let loss = heroes
+            .filter_map(|stats| stats.stats.get("Games Lost"))
+            .copied()
+            .sum::<Option<Stat>>()
+            .unwrap_or(Stat::Number(0.))
+            .as_f64()? as usize;
+        Some(Stats {
+            time,
+            win,
+            draw,
+            loss,
+        })
     }
 
+    #[allow(clippy::cast_sign_loss)]
     pub fn stats(&self) -> Option<Stats> {
-        None
+        let all = &self
+            .profile
+            .as_ref()?
+            .competitive_pc
+            .get("ALL HEROES")?
+            .stats;
+        let time = all
+            .get("Time Played")
+            .unwrap_or(&Stat::Duration(Duration::ZERO))
+            .as_duration()?;
+        let win = all.get("Games Won").unwrap_or(&Stat::Number(0.)).as_f64()? as usize;
+        let draw = all
+            .get("Games Tied")
+            .unwrap_or(&Stat::Number(0.))
+            .as_f64()? as usize;
+        let loss = all
+            .get("Games Lost")
+            .unwrap_or(&Stat::Number(0.))
+            .as_f64()? as usize;
+        Some(Stats {
+            time,
+            win,
+            draw,
+            loss,
+        })
     }
 
     pub fn hero_stats(&self, hero: &str) -> Option<BTreeMap<String, Stat>> {
@@ -75,7 +139,7 @@ impl Player {
                 .stats
                 .iter()
                 .filter(|(name, _)| visible_stats.contains(&name.as_str()))
-                .map(|(name, stat)| (name.clone(), stat.clone()))
+                .map(|(name, stat)| (name.clone(), *stat))
                 .collect(),
         )
     }

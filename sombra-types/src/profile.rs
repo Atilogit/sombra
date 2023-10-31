@@ -87,7 +87,7 @@ pub struct HeroStats {
     pub stats: HashMap<String, Stat>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[serde(try_from = "String", into = "String")]
 pub enum Stat {
     Number(f64),
@@ -271,5 +271,30 @@ impl Stat {
             Self::Duration(d) => Some(*d),
             _ => None,
         }
+    }
+}
+
+impl std::ops::Add for Stat {
+    type Output = Option<Self>;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        match (self, rhs) {
+            (Self::Number(a), Self::Number(b)) => Some(Self::Number(a + b)),
+            (Self::Duration(a), Self::Duration(b)) => Some(Self::Duration(a + b)),
+            (Self::Percentage(a), Self::Percentage(b)) => Some(Self::Percentage(a + b)),
+            _ => None,
+        }
+    }
+}
+
+impl std::iter::Sum<Stat> for Option<Stat> {
+    fn sum<I: Iterator<Item = Stat>>(mut iter: I) -> Self {
+        let mut sum = iter.next()?;
+
+        for i in iter {
+            sum = (sum + i)?;
+        }
+
+        Some(sum)
     }
 }

@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, time::Duration};
 
 use leptos::{IntoView, *};
 use sombra_client::{Division, Group, Hero, Rank, Role, Stat};
@@ -17,14 +17,11 @@ impl Player {
             .collect::<Vec<_>>();
         hero_stats.sort_by_key(|(stats, _)| stats["Time Played"].as_duration());
         hero_stats.reverse();
-        let hero_bars = hero_stats
-            .iter()
-            .enumerate()
-            .map(|(z, (stats, hero))| {
-                let time = stats["Time Played"].as_duration().unwrap();
-                view! { <HeroBar stats=&stats hero=hero proportion=time.as_secs_f64() z={hero_stats.len() - z} /> }
-            })
-            .collect_view();
+        let hero_bars_tank = hero_bars(&hero_stats, Role::Tank);
+        let hero_bars_dps = hero_bars(&hero_stats, Role::Damage);
+        let hero_bars_supp = hero_bars(&hero_stats, Role::Support);
+
+        let stats = self.stats();
 
         view! {
             <div
@@ -39,41 +36,59 @@ impl Player {
                         </div>
 
                         <div class="grid grid-cols-3">
-                            { self.rank(Role::Tank).map(|rank| view!{ <Rank rank=&rank />} ) }
-                            { self.rank(Role::Damage).map(|rank| view!{ <Rank rank=&rank />} ) }
-                            { self.rank(Role::Support).map(|rank| view!{ <Rank rank=&rank />} ) }
+                            <div class="text-center">{ self.rank(Role::Tank).map(|rank| view!{ <Rank rank=&rank />} ) }</div>
+                            <div class="text-center">{ self.rank(Role::Damage).map(|rank| view!{ <Rank rank=&rank />} ) }</div>
+                            <div class="text-center">{ self.rank(Role::Support).map(|rank| view!{ <Rank rank=&rank />} ) }</div>
                         </div>
 
                         <div class="grid grid-cols-3">
-                            <div class="font-bold">
-                                <div>Time Played</div>
-                                <div>Record</div>
-                            </div>
-                            <div class="col-span-2 font-semibold">
-                                <div>7h</div>
-                                <div>
-                                    <span class="text-green-500">25</span> - 0 - <span class="text-red-500">16</span>
-                                </div>
-                            </div>
+                            {stats.map(|stats|{
+                                view! {
+                                    <div class="font-bold">
+                                        <div>Time Played</div>
+                                        <div>Record</div>
+                                    </div>
+                                    <div class="col-span-2 font-semibold">
+                                        <div>{humantime::format_duration(stats.time).to_string()}</div>
+                                        <div>
+                                            <span class="text-green-500">{stats.win}</span> - {stats.draw} - <span class="text-red-500">{stats.loss}</span>
+                                        </div>
+                                    </div>
+                                }
+                            })}
                         </div>
 
                         <div class="grid grid-cols-3 font-semibold">
-                            { self.role_stats(Role::Tank).map(|stats| view!{ <TopStat stats=&stats />} ) }
-                            { self.role_stats(Role::Damage).map(|stats| view!{ <TopStat stats=&stats />} ) }
-                            { self.role_stats(Role::Support).map(|stats| view!{ <TopStat stats=&stats />} ) }
+                            <div class="text-center">{ self.role_stats(Role::Tank).map(|stats| view!{ <TopStat stats=&stats />} ) }</div>
+                            <div class="text-center">{ self.role_stats(Role::Damage).map(|stats| view!{ <TopStat stats=&stats />} ) }</div>
+                            <div class="text-center">{ self.role_stats(Role::Support).map(|stats| view!{ <TopStat stats=&stats />} ) }</div>
                         </div>
                     </div>
                     <img src={self.namecard_url()} />
                 </div>
                 {(!hero_stats.is_empty()).then(|| view! {
                     <div class="flex h-20 w-full text-black">
-                        {hero_bars}
+                        {hero_bars_tank}
+                        {hero_bars_dps}
+                        {hero_bars_supp}
                     </div>
                 })}
 
             </div>
         }
     }
+}
+
+fn hero_bars(hero_stats: &Vec<(BTreeMap<String, Stat>, &Hero)>, role: Role) -> View {
+    hero_stats
+        .iter()
+        .filter(|(_, hero)| hero.role == role)
+        .enumerate()
+        .map(|(z, (stats, hero))| {
+            let time = stats["Time Played"].as_duration().unwrap();
+            view! { <HeroBar stats=&stats hero=hero proportion=time.as_secs_f64() z={hero_stats.len() - z} /> }
+        })
+        .collect_view()
 }
 
 #[component]
@@ -113,24 +128,24 @@ fn HeroBarStat<'st>(name: &'st String, stat: &'st Stat) -> impl IntoView {
 
 #[component]
 fn TopStat<'st>(stats: &'st Stats) -> impl IntoView {
-    view! {
-        <div class="text-center">
-            <div>{format!("{:?}", stats.time)}</div>
+    if stats.time == Duration::ZERO {
+        view! {}.into_view()
+    } else {
+        view! {
+            <div>{humantime::format_duration(stats.time).to_string()}</div>
             <div><span class="text-green-500">{stats.win}</span> - {stats.draw} - <span class="text-red-500">{stats.loss}</span></div>
-        </div>
+        }.into_view()
     }
 }
 
 #[component]
-fn rank<'ra>(rank: &'ra Rank) -> impl IntoView {
+fn Rank<'ra>(rank: &'ra Rank) -> impl IntoView {
     view! {
-        <div class="text-center">
-            <div class="inline-block w-8 text-center">
-                <img src=role_icon_url(rank.role) class="inline-block h-8" />
-            </div>
-            <div class="inline-block w-14 text-center">
-                <img src=rank_icon_url(rank.group, rank.division) class="inline-block h-12" />
-            </div>
+        <div class="inline-block w-8 text-center">
+            <img src=role_icon_url(rank.role) class="inline-block h-8" />
+        </div>
+        <div class="inline-block w-14 text-center">
+            <img src=rank_icon_url(rank.group, rank.division) class="inline-block h-12" />
         </div>
     }
 }
