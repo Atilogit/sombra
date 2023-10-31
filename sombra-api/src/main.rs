@@ -27,9 +27,11 @@ enum ApiTags {
 #[OpenApi(prefix_path = "/v1", tag = "ApiTags::V1")]
 impl Api {
     async fn new() -> Self {
-        Self {
-            client: Arc::new(CachedClient::new().await.unwrap()),
-        }
+        #[cfg(not(debug_assertions))]
+        let client = Arc::new(CachedClient::new_default().await.unwrap());
+        #[cfg(debug_assertions)]
+        let client = Arc::new(CachedClient::new_max().await.unwrap());
+        Self { client }
     }
 
     #[oai(path = "/search", method = "get")]

@@ -17,13 +17,25 @@ pub struct CachedClient {
 }
 
 impl CachedClient {
-    pub async fn new() -> crate::Result<Self> {
+    pub async fn new(
+        profile_lifespan: u64,
+        overbuff_lifespan: u64,
+        search_lifespan: u64,
+    ) -> crate::Result<Self> {
         Ok(Self {
             client: Client::new().await?,
-            profile_cache: Mutex::new(TimedCache::with_lifespan(60 * 20)),
-            overbuff_cache: Mutex::new(TimedCache::with_lifespan(60 * 20)),
-            search_cache: Mutex::new(TimedCache::with_lifespan(60 * 20)),
+            profile_cache: Mutex::new(TimedCache::with_lifespan(profile_lifespan)),
+            overbuff_cache: Mutex::new(TimedCache::with_lifespan(overbuff_lifespan)),
+            search_cache: Mutex::new(TimedCache::with_lifespan(search_lifespan)),
         })
+    }
+
+    pub async fn new_default() -> crate::Result<Self> {
+        Self::new(60 * 20, 60 * 20, 60 * 20).await
+    }
+
+    pub async fn new_max() -> crate::Result<Self> {
+        Self::new(u64::MAX, u64::MAX, u64::MAX).await
     }
 
     pub async fn profile_full(&self, btag: &Battletag) -> crate::Result<PlayerProfile> {
