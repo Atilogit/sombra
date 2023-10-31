@@ -255,3 +255,21 @@ impl From<Stat> for String {
         val.to_string()
     }
 }
+
+impl Stat {
+    #[must_use]
+    pub const fn as_f64(&self) -> Option<f64> {
+        match self {
+            Self::Number(n) | Self::Percentage(n) => Some(*n),
+            Self::Duration(_) => None,
+        }
+    }
+
+    #[must_use]
+    pub const fn as_duration(&self) -> Option<Duration> {
+        match self {
+            Self::Duration(d) => Some(*d),
+            _ => None,
+        }
+    }
+}
