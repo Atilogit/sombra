@@ -49,7 +49,7 @@ impl Player {
                                         <div>Record</div>
                                     </div>
                                     <div class="col-span-2 font-semibold">
-                                        <div>{humantime::format_duration(stats.time).to_string()}</div>
+                                        <div>{format_duration(stats.time)}</div>
                                         <div>
                                             <span class="text-green-500">{stats.win}</span> - {stats.draw} - <span class="text-red-500">{stats.loss}</span>
                                         </div>
@@ -100,7 +100,7 @@ fn HeroBar<'st>(
 ) -> impl IntoView {
     view! {
         <div class="group flex w-0 flex-auto items-center justify-center bg-pink-400 shadow transition-all hover:w-full"
-            style={format!("flex-grow: {proportion}; z-index: {z}; box-shadow: 0px 4px 4px 4px #0004;")}>
+            style={format!("flex-grow: {proportion}; z-index: {z}; box-shadow: 0px 4px 4px 4px #0004; background-color: #{:}", hero.color)}>
             <div class="flex h-full flex-wrap items-center">
                 <div class="ml-px h-full group-hover:hidden"></div>
                 <img src=hero.portrait.to_string() class="h-14 w-14 rounded-full group-hover:ml-4" />
@@ -132,7 +132,7 @@ fn TopStat<'st>(stats: &'st Stats) -> impl IntoView {
         view! {}.into_view()
     } else {
         view! {
-            <div>{humantime::format_duration(stats.time).to_string()}</div>
+            <div>{format_duration(stats.time)}</div>
             <div><span class="text-green-500">{stats.win}</span> - {stats.draw} - <span class="text-red-500">{stats.loss}</span></div>
         }.into_view()
     }
@@ -163,4 +163,21 @@ fn rank_icon_url(group: Group, division: Division) -> String {
     format!(
         "https://www.overbuff.com/_next/image?url=%2FskillDivisions%2F{group}-{division}.png&w=750&q=75"
     )
+}
+
+#[allow(clippy::integer_division)]
+fn format_duration(d: Duration) -> String {
+    use std::fmt::Write;
+    let mut d = d;
+    let mut s = String::new();
+    if d.as_secs() >= 3600 {
+        write!(&mut s, "{}h ", d.as_secs() / 3600).unwrap();
+        d = d - Duration::from_secs(d.as_secs() / 3600 * 3600);
+    }
+    if d.as_secs() >= 60 {
+        write!(&mut s, "{}m ", d.as_secs() / 60).unwrap();
+        d = d - Duration::from_secs(d.as_secs() / 60 * 60);
+    }
+    write!(&mut s, "{}s", d.as_secs()).unwrap();
+    s
 }
