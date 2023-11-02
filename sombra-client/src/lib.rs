@@ -5,6 +5,7 @@ mod error;
 pub use error::*;
 pub use sombra_types::*;
 
+#[derive(Clone)]
 pub struct Client {
     url: String,
     client: reqwest::Client,

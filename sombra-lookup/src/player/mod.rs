@@ -3,7 +3,9 @@ mod view;
 use std::{collections::BTreeMap, time::Duration};
 
 use serde_derive::{Deserialize, Serialize};
-use sombra_client::{Battletag, FoundPlayer, Hero, Overbuff, PlayerProfile, Rank, Role, Stat};
+use sombra_client::{
+    Battletag, Client, FoundPlayer, Hero, Overbuff, PlayerProfile, Rank, Role, Stat,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Player {
@@ -22,8 +24,28 @@ pub struct Stats {
 }
 
 impl Player {
-    pub async fn fetch(btag: Battletag, heroes: Vec<Hero>) -> Option<Self> {
-        None
+    pub async fn fetch(btag: Battletag, heroes: Vec<Hero>, client: Client) -> Option<Self> {
+        let found = client
+            .search(&btag.name)
+            .await
+            .ok()
+            .and_then(|v| v.into_iter().find(|p| p.battle_tag == btag))?;
+        let profile = client.profile_full(&btag).await.ok();
+        let fetch_overbuff = profile.is_none()
+            || !found.is_public
+            || profile.as_ref().is_some_and(|p| p.ranks.is_empty());
+        let overbuff = if fetch_overbuff {
+            client.overbuff(&btag).await.ok()
+        } else {
+            None
+        };
+        Some(Self {
+            btag,
+            profile,
+            overbuff,
+            found,
+            heroes,
+        })
     }
 
     pub fn namecard_url(&self) -> String {

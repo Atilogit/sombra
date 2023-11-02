@@ -22,6 +22,11 @@ fn App() -> impl IntoView {
     let btag_regex = regex::Regex::new(r"[^\pZ\pC#]*#[0-9]+").unwrap();
 
     #[cfg(not(debug_assertions))]
+    let client = Client::new("https://sombra.shuttleapp.rs/");
+    #[cfg(debug_assertions)]
+    let client = Client::new("http://127.0.0.1:8000");
+
+    #[cfg(not(debug_assertions))]
     let (btag_input, set_btag_input) = create_signal(String::new());
     #[cfg(debug_assertions)]
     let (btag_input, set_btag_input, _) = use_storage("btag_input", String::new());
@@ -29,33 +34,12 @@ fn App() -> impl IntoView {
     let (players, set_players) = create_signal(Vec::<Player>::new());
 
     let load_player = create_action(move |btag: &Battletag| {
+        let client = client.clone();
         let btag = btag.clone();
         async move {
-            // let client = Client::new("https://sombra.shuttleapp.rs/");
-            let client = Client::new("http://127.0.0.1:8000");
-            let found = client
-                .search(&btag.name)
-                .await
-                .ok()
-                .and_then(|v| v.into_iter().find(|p| p.battle_tag == btag));
-            if let Some(found) = found {
-                let profile = client.profile_full(&btag).await.ok();
-                let overbuff = if profile.is_none()
-                    || !found.is_public
-                    || profile.as_ref().is_some_and(|p| p.ranks.is_empty())
-                {
-                    client.overbuff(&btag).await.ok()
-                } else {
-                    None
-                };
-                let heroes = client.heroes().await.ok().unwrap_or(Vec::new());
-                let player = Player {
-                    btag,
-                    profile,
-                    overbuff,
-                    found,
-                    heroes,
-                };
+            let heroes = client.heroes().await.ok().unwrap_or(Vec::new());
+            let player = Player::fetch(btag, heroes, client).await;
+            if let Some(player) = player {
                 set_players.update(|players| players.push(player));
             }
         }
@@ -92,7 +76,7 @@ fn App() -> impl IntoView {
                 </For>
             </div>
         </div>
-        <footer class="footer p-10 bg-neutral text-neutral-content">
+        <footer class="footer p-10 bg-neutral text-neutral-content motion-safe:bg-black">
             <nav>
             <header class="footer-title">Social</header>
             <div class="grid grid-flow-col gap-4">
