@@ -7,7 +7,7 @@ use error::Result;
 
 use std::{collections::HashMap, sync::Arc};
 
-use poem::{middleware, EndpointExt, Route};
+use poem::{endpoint::StaticFilesEndpoint, middleware, EndpointExt, Route};
 use poem_openapi::{param::Query, payload::Json, ContactObject, OpenApi, OpenApiService, Tags};
 use shuttle_poem::ShuttlePoem;
 use sombra::{
@@ -99,6 +99,12 @@ async fn poem() -> ShuttlePoem<impl poem::Endpoint> {
         .nest("/docs", ui)
         .nest("/spec.json", spec_json)
         .nest("/spec.yaml", spec_yaml)
+        .nest(
+            "/",
+            StaticFilesEndpoint::new("sombra-lookup/dist/")
+                .fallback_to_index()
+                .index_file("index.html"),
+        )
         .with(middleware::Compression::new())
         .with(middleware::Tracing);
 

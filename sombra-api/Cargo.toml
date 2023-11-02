@@ -5,10 +5,10 @@ edition = "2021"
 
 [dependencies]
 sombra = { path = "../sombra", features = ["poem_openapi"] }
-poem = { version = "1.3", features = ["compression"] }
+poem = { version = "1.3", features = ["compression", "static-files"] }
 poem-openapi.workspace = true
-shuttle-poem = "0.30"
-shuttle-runtime = "0.30"
+shuttle-poem = "0.31"
+shuttle-runtime = "0.31"
 tokio = "1.28"
 thiserror.workspace = true
 serde.workspace = true
