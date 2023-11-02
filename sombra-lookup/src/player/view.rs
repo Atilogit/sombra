@@ -25,10 +25,10 @@ impl Player {
 
         view! {
             <div
-                class="cursor-default overflow-hidden whitespace-nowrap rounded-2xl font-['Inter'] drop-shadow-xl h-fit">
-                <div class="relative">
-                    <div class="from-base-300 absolute h-full w-full bg-gradient-to-l opacity-100"></div>
-                    <div class="bg-base-300 absolute h-full w-full opacity-75"></div>
+                class="cursor-default whitespace-nowrap font-['Inter'] drop-shadow-xl h-fit">
+                <div class="relative rounded-b-2xl" class:rounded-b-2xl=hero_stats.is_empty()>
+                    <div class="from-base-300 absolute h-full w-full bg-gradient-to-l opacity-100 rounded-t-2xl overflow-hidden" class:rounded-b-2xl=hero_stats.is_empty()></div>
+                    <div class="bg-base-300 absolute h-full w-full opacity-75 rounded-t-2xl overflow-hidden" class:rounded-b-2xl=hero_stats.is_empty()></div>
                     <div class="absolute grid h-full w-full grid-cols-2 grid-rows-2 items-center px-6 py-4 text-white">
                         <div class="self-start">
                             <div class="text-xl font-bold">{self.btag.to_string()}</div>
@@ -50,7 +50,7 @@ impl Player {
                                     </div>
                                     <div class="col-span-2 font-semibold">
                                         <div>{format_duration(stats.time)}</div>
-                                        <div>
+                                        <div class="tooltip" data-tip="Win - Draw - Loss">
                                             <span class="text-green-500">{stats.win}</span> - {stats.draw} - <span class="text-red-500">{stats.loss}</span>
                                         </div>
                                     </div>
@@ -64,10 +64,10 @@ impl Player {
                             <div class="text-center">{ self.role_stats(Role::Support).map(|stats| view!{ <TopStat stats=&stats />} ) }</div>
                         </div>
                     </div>
-                    <img src={self.namecard_url()} />
+                    <img src={self.namecard_url()} class="rounded-t-2xl overflow-hidden" class:rounded-b-2xl=hero_stats.is_empty() />
                 </div>
                 {(!hero_stats.is_empty()).then(|| view! {
-                    <div class="flex h-20 w-full text-black">
+                    <div class="flex h-20 w-full text-black overflow-hidden rounded-b-2xl">
                         {hero_bars_tank}
                         {hero_bars_dps}
                         {hero_bars_supp}
@@ -99,13 +99,13 @@ fn HeroBar<'st>(
     z: usize,
 ) -> impl IntoView {
     view! {
-        <div class="group flex w-0 flex-auto items-center justify-center bg-pink-400 shadow transition-all hover:w-full"
-            style={format!("flex-grow: {proportion}; z-index: {z}; box-shadow: 0px 4px 4px 4px #0004; background-color: #{:}", hero.color)}>
+        <div class="group flex w-0 flex-auto items-center justify-center transition-all hover:w-full"
+            style={format!("flex-grow: {proportion}; z-index: {z}; box-shadow: 0px 4px 4px 4px #0008; background-color: #{:}", hero.color)}>
             <div class="flex h-full flex-wrap items-center">
                 <div class="ml-px h-full group-hover:hidden"></div>
-                <img src=hero.portrait.to_string() class="h-14 w-14 rounded-full group-hover:ml-4" />
+                <img src=hero.portrait.to_string() class="h-14 w-14 rounded-full transition-all duration-75 group-hover:ml-4" />
             </div>
-            <div class="flex w-0 justify-around group-hover:w-full">
+            <div class="flex w-0 justify-around transition-all group-hover:w-full">
                 {
                     stats.iter().map(|stat| {
                         view! { <HeroBarStat name=stat.0 stat=stat.1 /> }
@@ -133,7 +133,9 @@ fn TopStat<'st>(stats: &'st Stats) -> impl IntoView {
     } else {
         view! {
             <div>{format_duration(stats.time)}</div>
-            <div><span class="text-green-500">{stats.win}</span> - {stats.draw} - <span class="text-red-500">{stats.loss}</span></div>
+            <div class="tooltip" data-tip="Win - Draw - Loss">
+                <span class="text-green-500">{stats.win}</span> - {stats.draw} - <span class="text-red-500">{stats.loss}</span>
+            </div>
         }.into_view()
     }
 }
@@ -141,11 +143,13 @@ fn TopStat<'st>(stats: &'st Stats) -> impl IntoView {
 #[component]
 fn Rank<'ra>(rank: &'ra Rank) -> impl IntoView {
     view! {
-        <div class="inline-block w-8 text-center">
-            <img src=role_icon_url(rank.role) class="inline-block h-8" />
-        </div>
-        <div class="inline-block w-14 text-center">
-            <img src=rank_icon_url(rank.group, rank.division) class="inline-block h-12" />
+        <div class="tooltip" data-tip={format!("{:?} {} {:?}", rank.group, rank.division, rank.role)}>
+            <div class="inline-block w-8 text-center">
+                <img src=role_icon_url(rank.role) class="inline-block h-8" />
+            </div>
+            <div class="inline-block w-14 text-center">
+                <img src=rank_icon_url(rank.group, rank.division) class="inline-block h-12" />
+            </div>
         </div>
     }
 }

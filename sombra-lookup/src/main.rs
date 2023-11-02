@@ -21,6 +21,9 @@ fn main() {
 fn App() -> impl IntoView {
     let btag_regex = regex::Regex::new(r"[^\pZ\pC#]*#[0-9]+").unwrap();
 
+    #[cfg(not(debug_assertions))]
+    let (btag_input, set_btag_input) = create_signal(String::new());
+    #[cfg(debug_assertions)]
     let (btag_input, set_btag_input, _) = use_storage("btag_input", String::new());
     let (btags, set_btags) = create_signal(Vec::<Battletag>::new());
     let (players, set_players) = create_signal(Vec::<Player>::new());
