@@ -19,11 +19,28 @@ serde_derive = "1.0"
 serde_json = "1.0"
 futures = "0.3"
 
-[profile.release-wasm]
-inherits = "release"
+# wasm release profile used in build.rs
+# HACK: trunk doesn't support custom profiles and deadlocks when the same profile is used
+[profile.dev]
 opt-level = 'z'
+lto = true
 debug = false
 strip = true
+debug-assertions = false
+overflow-checks = false
+incremental = false
+codegen-units = 1
+
+# actual dev profile
+[profile.dbg]
+inherits = "dev"
+opt-level = 0
+debug = true
+debug-assertions = true
+overflow-checks = true
+lto = false
+incremental = true
+codegen-units = 256
 
 [profile.release]
 lto = true

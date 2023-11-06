@@ -12,7 +12,3 @@ leptos-use = { version = "0.8", features = ["storage"] }
 regex = "1.10"
 serde.workspace = true
 serde_derive.workspace = true
-
-[profile.release]
-opt-level = 'z'
-strip = true
